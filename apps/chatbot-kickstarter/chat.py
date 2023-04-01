@@ -48,12 +48,18 @@ if 'past' not in st.session_state:
     st.session_state['past'] = []
 
 def query(question):
-    response = st.session_state['chat'].ask_assistant(question)
+    try:
+        response = st.session_state['chat'].ask_assistant(question)
+    except Exception as e:
+        response = {
+            'content': 'Sorry, I am not able to aswer your question. Please try again later.'
+        }
     return response
 
-prompt = st.text_input("What do you want to know: ","", key="input")
 
-if st.button('Submit', key='generationSubmit'):
+prompt = st.text_input("What do you want to know: ", "", key="input")
+
+if st.button('Submit', key='generationSubmit') or prompt:
 
     # Initialization
     if 'chat' not in st.session_state:
