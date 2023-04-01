@@ -3,6 +3,7 @@ from streamlit_chat import message
 
 from database import get_redis_connection
 from chatbot import RetrievalAssistant, Message
+import datetime
 
 # Initialise database
 
@@ -56,11 +57,13 @@ def query(question):
         }
     return response
 
-
 prompt = st.text_input("What do you want to know: ", "", key="input")
 
-if st.button('Submit', key='generationSubmit') or prompt:
+def time():
+    now = datetime.datetime.now()
+    return f"{now.hour}:{now.minute}:{now.second}"
 
+if st.button('Submit', key='generationSubmit') or prompt.strip():
     # Initialization
     if 'chat' not in st.session_state:
         st.session_state['chat'] = RetrievalAssistant()
@@ -70,17 +73,16 @@ if st.button('Submit', key='generationSubmit') or prompt:
     else:
         messages = []
 
-
     user_message = Message('user',prompt)
     messages.append(user_message.message())
-
     response = query(messages)
 
     # Debugging step to print the whole response
     #st.write(response)
 
-    st.session_state.past.append(prompt)
-    st.session_state.generated.append(response['content'])
+    st.session_state.past.append(f"{time()}\n{prompt}")
+    st.session_state.generated.append(f"{time()}\n{response['content']}")
+    prompt = ""
 
 if st.session_state['generated']:
 
